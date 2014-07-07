@@ -44,7 +44,16 @@ if test "$PHP_PDM" = "yes"; then
 	pdm/di/injectionawareinterface.zep.c
 	pdm/entity/abstractentity.zep.c
 	pdm/entity/entityinterface.zep.c
-	pdm/entity/metadata.zep.c "
+	pdm/entity/metadata.zep.c
+	pdm/query/abstractquery.zep.c
+	pdm/query/common/limitinterface.zep.c
+	pdm/query/common/limitoffsetinterface.zep.c
+	pdm/query/common/orderbyinterface.zep.c
+	pdm/query/common/select.zep.c
+	pdm/query/common/selectinterface.zep.c
+	pdm/query/exception.zep.c
+	pdm/query/queryfactory.zep.c
+	pdm/query/queryinterface.zep.c "
 	PHP_NEW_EXTENSION(pdm, $pdm_sources, $ext_shared)
 
 	old_CPPFLAGS=$CPPFLAGS

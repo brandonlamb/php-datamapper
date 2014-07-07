@@ -47,5 +47,14 @@
 #include "pdm/entity/abstractentity.zep.h"
 #include "pdm/entity/entityinterface.zep.h"
 #include "pdm/entity/metadata.zep.h"
+#include "pdm/query/abstractquery.zep.h"
+#include "pdm/query/common/limitinterface.zep.h"
+#include "pdm/query/common/limitoffsetinterface.zep.h"
+#include "pdm/query/common/orderbyinterface.zep.h"
+#include "pdm/query/common/select.zep.h"
+#include "pdm/query/common/selectinterface.zep.h"
+#include "pdm/query/exception.zep.h"
+#include "pdm/query/queryfactory.zep.h"
+#include "pdm/query/queryinterface.zep.h"
 
 #endif

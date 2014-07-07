@@ -24,6 +24,7 @@
 #include "kernel/fcall.h"
 #include "kernel/memory.h"
 
+zend_class_entry *pdm_query_common_limitinterface_ce;
 zend_class_entry *pdm_db_adapterinterface_ce;
 zend_class_entry *pdm_db_columninterface_ce;
 zend_class_entry *pdm_db_connectionlocatorinterface_ce;
@@ -34,11 +35,16 @@ zend_class_entry *pdm_db_resultinterface_ce;
 zend_class_entry *pdm_di_containerinterface_ce;
 zend_class_entry *pdm_di_injectionawareinterface_ce;
 zend_class_entry *pdm_entity_entityinterface_ce;
+zend_class_entry *pdm_query_common_limitoffsetinterface_ce;
+zend_class_entry *pdm_query_common_orderbyinterface_ce;
+zend_class_entry *pdm_query_common_selectinterface_ce;
+zend_class_entry *pdm_query_queryinterface_ce;
 zend_class_entry *pdm_db_abstractadapter_ce;
 zend_class_entry *pdm_db_abstractdialect_ce;
 zend_class_entry *pdm_db_adapter_abstractpdo_ce;
 zend_class_entry *pdm_di_exception_ce;
 zend_class_entry *pdm_db_exception_ce;
+zend_class_entry *pdm_query_abstractquery_ce;
 zend_class_entry *pdm_autoload_loader_ce;
 zend_class_entry *pdm_db_abstractdb_ce;
 zend_class_entry *pdm_db_adapter_exception_ce;
@@ -67,6 +73,9 @@ zend_class_entry *pdm_di_exception_servicenotfound_ce;
 zend_class_entry *pdm_di_exception_servicenotobject_ce;
 zend_class_entry *pdm_entity_abstractentity_ce;
 zend_class_entry *pdm_entity_metadata_ce;
+zend_class_entry *pdm_query_common_select_ce;
+zend_class_entry *pdm_query_exception_ce;
+zend_class_entry *pdm_query_queryfactory_ce;
 
 ZEND_DECLARE_MODULE_GLOBALS(pdm)
 
@@ -232,6 +241,7 @@ static PHP_MINIT_FUNCTION(pdm)
 	setlocale(LC_ALL, "C");
 #endif
 
+	ZEPHIR_INIT(Pdm_Query_Common_LimitInterface);
 	ZEPHIR_INIT(Pdm_Db_AdapterInterface);
 	ZEPHIR_INIT(Pdm_Db_ColumnInterface);
 	ZEPHIR_INIT(Pdm_Db_ConnectionLocatorInterface);
@@ -242,11 +252,16 @@ static PHP_MINIT_FUNCTION(pdm)
 	ZEPHIR_INIT(Pdm_Di_ContainerInterface);
 	ZEPHIR_INIT(Pdm_Di_InjectionAwareInterface);
 	ZEPHIR_INIT(Pdm_Entity_EntityInterface);
+	ZEPHIR_INIT(Pdm_Query_Common_LimitOffsetInterface);
+	ZEPHIR_INIT(Pdm_Query_Common_OrderByInterface);
+	ZEPHIR_INIT(Pdm_Query_Common_SelectInterface);
+	ZEPHIR_INIT(Pdm_Query_QueryInterface);
 	ZEPHIR_INIT(Pdm_Db_AbstractAdapter);
 	ZEPHIR_INIT(Pdm_Db_AbstractDialect);
 	ZEPHIR_INIT(Pdm_Db_Adapter_AbstractPdo);
 	ZEPHIR_INIT(Pdm_Di_Exception);
 	ZEPHIR_INIT(Pdm_Db_Exception);
+	ZEPHIR_INIT(Pdm_Query_AbstractQuery);
 	ZEPHIR_INIT(Pdm_Autoload_Loader);
 	ZEPHIR_INIT(Pdm_Db_AbstractDb);
 	ZEPHIR_INIT(Pdm_Db_Adapter_Exception);
@@ -275,6 +290,9 @@ static PHP_MINIT_FUNCTION(pdm)
 	ZEPHIR_INIT(Pdm_Di_Exception_ServiceNotObject);
 	ZEPHIR_INIT(Pdm_Entity_AbstractEntity);
 	ZEPHIR_INIT(Pdm_Entity_MetaData);
+	ZEPHIR_INIT(Pdm_Query_Common_Select);
+	ZEPHIR_INIT(Pdm_Query_Exception);
+	ZEPHIR_INIT(Pdm_Query_QueryFactory);
 
 #if PHP_VERSION_ID < 50500
 	setlocale(LC_ALL, old_lc_all);

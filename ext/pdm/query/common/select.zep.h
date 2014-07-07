@@ -33,6 +33,7 @@ PHP_METHOD(Pdm_Query_Common_Select, reset);
 PHP_METHOD(Pdm_Query_Common_Select, build);
 PHP_METHOD(Pdm_Query_Common_Select, buildSelect);
 PHP_METHOD(Pdm_Query_Common_Select, buildFrom);
+PHP_METHOD(Pdm_Query_Common_Select, buildJoin);
 PHP_METHOD(Pdm_Query_Common_Select, buildGroupBy);
 PHP_METHOD(Pdm_Query_Common_Select, buildHaving);
 PHP_METHOD(Pdm_Query_Common_Select, buildForUpdate);
@@ -67,6 +68,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_pdm_query_common_select_join, 0, 0, 2)
 	ZEND_ARG_INFO(0, type)
 	ZEND_ARG_INFO(0, spec)
 	ZEND_ARG_INFO(0, cond)
+	ZEND_ARG_INFO(0, binds)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_pdm_query_common_select_innerjoin, 0, 0, 1)
@@ -166,6 +168,7 @@ ZEPHIR_INIT_FUNCS(pdm_query_common_select_method_entry) {
 	PHP_ME(Pdm_Query_Common_Select, build, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Pdm_Query_Common_Select, buildSelect, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Pdm_Query_Common_Select, buildFrom, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Pdm_Query_Common_Select, buildJoin, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Pdm_Query_Common_Select, buildGroupBy, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Pdm_Query_Common_Select, buildHaving, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Pdm_Query_Common_Select, buildForUpdate, NULL, ZEND_ACC_PROTECTED)

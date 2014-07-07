@@ -47,7 +47,7 @@ class Select
 
     /**
      *
-     * Select from these tables
+     * Select from these tables; includes JOIN clauses.
      *
      * @var array
      *
@@ -62,33 +62,6 @@ class Select
      *
      */
     protected fromKey = -1;
-
-    /**
-     *
-     * Join on these tables
-     *
-     * @var array
-     *
-     */
-    protected join = [];
-
-    /**
-     *
-     * The current key in the `$join` array.
-     *
-     * @var int
-     *
-     */
-    protected joinKey = 0;
-
-    /**
-     *
-     * Bind values in the JOIN
-     *
-     * @var array
-     *
-     */
-    protected bindJoin = [];
 
     /**
      *
@@ -177,46 +150,19 @@ class Select
      */
     public function getBindValues() -> array
     {
-        var bindValues, i, val, subVal;
+        var bindValues, i, val;
 
         let bindValues = this->bindValues;
-        //let bindValues = this->bindJoin;
         let i = 1;
 
-        for val in this->bindJoin {
-            if typeof val == "array" {
-                for subVal in val {
-                    let bindValues[i] = subVal;
-                    let i++;
-                }
-            } else {
-                let bindValues[i] = val;
-                let i++;
-            }
-        }
-
         for val in this->bindWhere {
-            if typeof val == "array" {
-                for subVal in val {
-                    let bindValues[i] = subVal;
-                    let i++;
-                }
-            } else {
-                let bindValues[i] = val;
-                let i++;
-            }
+            let bindValues[i] = val;
+            let i++;
         }
 
         for val in this->bindHaving {
-            if typeof val == "array" {
-                for subVal in val {
-                    let bindValues[i] = subVal;
-                    let i++;
-                }
-            } else {
-                let bindValues[i] = val;
-                let i++;
-            }
+            let bindValues[i] = val;
+            let i++;
         }
 
         return bindValues;
@@ -328,20 +274,25 @@ class Select
      * @throws Exception
      *
      */
-    public function join(string! type, string! spec, var cond = null, var binds = []) -> <\Pdm\Query\Common\SelectInterface>
+    public function join(string! type, string! spec, var cond = null) -> <\Pdm\Query\Common\SelectInterface>
     {
-        if unlikely typeof binds != "array" {
-            throw new \InvalidArgumentException("binds must be an array.");
-        }
+        var join, sql, key;
 
         if unlikely empty this->from {
             throw new Exception("Cannot join() without from() first.");
         }
 
+        let join = strtoupper(trim(type)) . " JOIN ";
         let cond = this->fixJoinCondition(cond);
-        let this->join[this->joinKey] = trim(strtoupper(trim(type)) . " JOIN " . spec . " " . cond);
-        let this->bindJoin[this->joinKey] = binds;
-        let this->joinKey++;
+        let sql = trim(join . spec . " " . cond);
+
+        if fetch key, this->from[this->fromKey] {
+            let key[] = sql;
+        } else {
+            let key = [sql];
+        }
+
+        let this->from[this->fromKey] = key;
 
         return this;
     }
@@ -438,7 +389,7 @@ class Select
     {
         var col;
 
-        if unlikely typeof spec != "array" {
+        if typeof spec != "array" {
             throw new \InvalidArgumentException("spec must be array.");
         }
 
@@ -462,7 +413,7 @@ class Select
      */
     public function having(string! cond, var binds = []) -> <\Pdm\Query\Common\SelectInterface>
     {
-        if unlikely typeof binds != "array" {
+        if typeof binds != "array" {
             throw new \InvalidArgumentException("binds must be array.");
         }
         return this->addClauseCondWithBind("having", "AND", binds);
@@ -483,7 +434,7 @@ class Select
      */
     public function orHaving(string! cond, var binds = []) -> <\Pdm\Query\Common\SelectInterface>
     {
-        if unlikely typeof binds != "array" {
+        if typeof binds != "array" {
             throw new \InvalidArgumentException("binds must be array.");
         }
         return this->addClauseCondWithBind("having", "OR", binds);
@@ -557,8 +508,8 @@ class Select
      */
     public function where(string! cond, var binds = []) -> <\Pdm\Query\Common\SelectInterface>
     {
-        if unlikely typeof binds != "array" {
-            let binds = [binds];
+        if typeof binds != "array" {
+            throw new \InvalidArgumentException("binds must be array.");
         }
         return this->addWhere("AND", cond, binds);
     }
@@ -579,7 +530,7 @@ class Select
      */
     public function orWhere(string! cond, var binds = [])
     {
-        if unlikely typeof binds != "array" {
+        if typeof binds != "array" {
             throw new \InvalidArgumentException("binds must be array.");
         }
         return this->addWhere("OR", cond, binds);
@@ -626,7 +577,7 @@ class Select
      */
     public function orderBy(var spec) -> <\Pdm\Query\Common\SelectInterface>
     {
-        if unlikely typeof spec != "array" {
+        if typeof spec != "array" {
             throw new \InvalidArgumentException("spec must be array.");
         }
 
@@ -723,8 +674,7 @@ class Select
         return "SELECT"
             . this->buildFlags()
             . this->buildSelect()
-            . this->buildFrom()
-            . this->buildJoin()
+            . this->buildFrom() // includes JOIN
             . this->buildWhere()
             . this->buildGroupBy()
             . this->buildHaving()
@@ -747,6 +697,7 @@ class Select
         if unlikely empty this->select {
             throw new Exception("No columns in the SELECT.");
         }
+
         return this->indentCsv(this->select);
     }
 
@@ -759,39 +710,18 @@ class Select
      */
     protected function buildFrom() -> string
     {
-        var refs, sqlQuery;
+        var refs, from;
 
         if empty this->from {
+            // not applicable
             return "";
         }
 
         let refs = [];
-        for sqlQuery in this->from {
-            let refs[] = implode(PHP_EOL, sqlQuery);
+        for from in this->from {
+            let refs[] = implode(PHP_EOL, from);
         }
         return PHP_EOL . "FROM" . this->indentCsv(refs);
-    }
-
-    /**
-     *
-     * Builds the JOIN clause.
-     *
-     * @return string
-     *
-     */
-    protected function buildJoin() -> string
-    {
-        var refs, sqlQuery;
-
-        if empty this->join {
-            return "";
-        }
-
-        let refs = [];
-        for sqlQuery in this->join {
-            let refs[] = PHP_EOL . sqlQuery;
-        }
-        return this->indent(refs);
     }
 
     /**
@@ -804,8 +734,10 @@ class Select
     protected function buildGroupBy() -> string
     {
         if empty this->groupBy {
+            // not applicable
             return "";
         }
+
         return PHP_EOL . "GROUP BY" . this->indentCsv(this->groupBy);
     }
 
@@ -819,8 +751,10 @@ class Select
     protected function buildHaving() -> string
     {
         if empty this->having {
+            // not applicable
             return "";
         }
+
         return PHP_EOL . "HAVING" . this->indent(this->having);
     }
 
@@ -834,8 +768,10 @@ class Select
     protected function buildForUpdate() -> string
     {
         if empty this->forUpdate {
+            // not applicable
             return "";
         }
+
         return PHP_EOL . "FOR UPDATE";
     }
 }

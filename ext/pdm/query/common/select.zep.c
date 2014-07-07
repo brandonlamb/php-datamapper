@@ -54,7 +54,7 @@ ZEPHIR_INIT_CLASS(Pdm_Query_Common_Select) {
 
 	/**
 	 *
-	 * Select from these tables; includes JOIN clauses.
+	 * Select from these tables
 	 *
 	 * @var array
 	 *
@@ -69,6 +69,33 @@ ZEPHIR_INIT_CLASS(Pdm_Query_Common_Select) {
 	 *
 	 */
 	zend_declare_property_long(pdm_query_common_select_ce, SL("fromKey"), -1, ZEND_ACC_PROTECTED TSRMLS_CC);
+
+	/**
+	 *
+	 * Join on these tables
+	 *
+	 * @var array
+	 *
+	 */
+	zend_declare_property_null(pdm_query_common_select_ce, SL("join"), ZEND_ACC_PROTECTED TSRMLS_CC);
+
+	/**
+	 *
+	 * The current key in the `$join` array.
+	 *
+	 * @var int
+	 *
+	 */
+	zend_declare_property_long(pdm_query_common_select_ce, SL("joinKey"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+
+	/**
+	 *
+	 * Bind values in the JOIN
+	 *
+	 * @var array
+	 *
+	 */
+	zend_declare_property_null(pdm_query_common_select_ce, SL("bindJoin"), ZEND_ACC_PROTECTED TSRMLS_CC);
 
 	/**
 	 *
@@ -197,35 +224,81 @@ PHP_METHOD(Pdm_Query_Common_Select, getPaging) {
  */
 PHP_METHOD(Pdm_Query_Common_Select, getBindValues) {
 
-	HashTable *_2, *_6;
-	HashPosition _1, _5;
+	HashTable *_2, *_5, *_9, *_12, *_16, *_19;
+	HashPosition _1, _4, _8, _11, _15, _18;
 	int i;
-	zval *bindValues = NULL, *val = NULL, *_0, **_3, *_4, **_7;
+	zval *bindValues = NULL, *val = NULL, *subVal = NULL, *_0, **_3, **_6, *_7, **_10, **_13, *_14, **_17, **_20;
 
 	ZEPHIR_MM_GROW();
 
 	_0 = zephir_fetch_nproperty_this(this_ptr, SL("bindValues"), PH_NOISY_CC);
 	ZEPHIR_CPY_WRT(bindValues, _0);
 	i = 1;
-	_0 = zephir_fetch_nproperty_this(this_ptr, SL("bindWhere"), PH_NOISY_CC);
+	_0 = zephir_fetch_nproperty_this(this_ptr, SL("bindJoin"), PH_NOISY_CC);
 	zephir_is_iterable(_0, &_2, &_1, 0, 0);
 	for (
 	  ; zephir_hash_get_current_data_ex(_2, (void**) &_3, &_1) == SUCCESS
 	  ; zephir_hash_move_forward_ex(_2, &_1)
 	) {
 		ZEPHIR_GET_HVALUE(val, _3);
-		zephir_array_update_long(&bindValues, i, &val, PH_COPY | PH_SEPARATE, "pdm/query/common/select.zep", 159);
-		i++;
+		if (Z_TYPE_P(val) == IS_ARRAY) {
+			zephir_is_iterable(val, &_5, &_4, 0, 0);
+			for (
+			  ; zephir_hash_get_current_data_ex(_5, (void**) &_6, &_4) == SUCCESS
+			  ; zephir_hash_move_forward_ex(_5, &_4)
+			) {
+				ZEPHIR_GET_HVALUE(subVal, _6);
+				zephir_array_update_long(&bindValues, i, &subVal, PH_COPY | PH_SEPARATE, "pdm/query/common/select.zep", 189);
+				i++;
+			}
+		} else {
+			zephir_array_update_long(&bindValues, i, &val, PH_COPY | PH_SEPARATE, "pdm/query/common/select.zep", 193);
+			i++;
+		}
 	}
-	_4 = zephir_fetch_nproperty_this(this_ptr, SL("bindHaving"), PH_NOISY_CC);
-	zephir_is_iterable(_4, &_6, &_5, 0, 0);
+	_7 = zephir_fetch_nproperty_this(this_ptr, SL("bindWhere"), PH_NOISY_CC);
+	zephir_is_iterable(_7, &_9, &_8, 0, 0);
 	for (
-	  ; zephir_hash_get_current_data_ex(_6, (void**) &_7, &_5) == SUCCESS
-	  ; zephir_hash_move_forward_ex(_6, &_5)
+	  ; zephir_hash_get_current_data_ex(_9, (void**) &_10, &_8) == SUCCESS
+	  ; zephir_hash_move_forward_ex(_9, &_8)
 	) {
-		ZEPHIR_GET_HVALUE(val, _7);
-		zephir_array_update_long(&bindValues, i, &val, PH_COPY | PH_SEPARATE, "pdm/query/common/select.zep", 164);
-		i++;
+		ZEPHIR_GET_HVALUE(val, _10);
+		if (Z_TYPE_P(val) == IS_ARRAY) {
+			zephir_is_iterable(val, &_12, &_11, 0, 0);
+			for (
+			  ; zephir_hash_get_current_data_ex(_12, (void**) &_13, &_11) == SUCCESS
+			  ; zephir_hash_move_forward_ex(_12, &_11)
+			) {
+				ZEPHIR_GET_HVALUE(subVal, _13);
+				zephir_array_update_long(&bindValues, i, &subVal, PH_COPY | PH_SEPARATE, "pdm/query/common/select.zep", 201);
+				i++;
+			}
+		} else {
+			zephir_array_update_long(&bindValues, i, &val, PH_COPY | PH_SEPARATE, "pdm/query/common/select.zep", 205);
+			i++;
+		}
+	}
+	_14 = zephir_fetch_nproperty_this(this_ptr, SL("bindHaving"), PH_NOISY_CC);
+	zephir_is_iterable(_14, &_16, &_15, 0, 0);
+	for (
+	  ; zephir_hash_get_current_data_ex(_16, (void**) &_17, &_15) == SUCCESS
+	  ; zephir_hash_move_forward_ex(_16, &_15)
+	) {
+		ZEPHIR_GET_HVALUE(val, _17);
+		if (Z_TYPE_P(val) == IS_ARRAY) {
+			zephir_is_iterable(val, &_19, &_18, 0, 0);
+			for (
+			  ; zephir_hash_get_current_data_ex(_19, (void**) &_20, &_18) == SUCCESS
+			  ; zephir_hash_move_forward_ex(_19, &_18)
+			) {
+				ZEPHIR_GET_HVALUE(subVal, _20);
+				zephir_array_update_long(&bindValues, i, &subVal, PH_COPY | PH_SEPARATE, "pdm/query/common/select.zep", 213);
+				i++;
+			}
+		} else {
+			zephir_array_update_long(&bindValues, i, &val, PH_COPY | PH_SEPARATE, "pdm/query/common/select.zep", 217);
+			i++;
+		}
 	}
 	RETURN_CCTOR(bindValues);
 
@@ -464,11 +537,11 @@ PHP_METHOD(Pdm_Query_Common_Select, fromSubSelect) {
 PHP_METHOD(Pdm_Query_Common_Select, join) {
 
 	int ZEPHIR_LAST_CALL_STATUS;
-	zval *type_param = NULL, *spec_param = NULL, *cond = NULL, *join, *sql, *key, *_0, *_1, *_2, *_3 = NULL, *_4, *_5, *_6, *_7;
+	zval *type_param = NULL, *spec_param = NULL, *cond = NULL, *binds = NULL, *_0, *_1 = NULL, *_2, *_3, *_4, *_5, *_6, *_7;
 	zval *type = NULL, *spec = NULL;
 
 	ZEPHIR_MM_GROW();
-	zephir_fetch_params(1, 2, 1, &type_param, &spec_param, &cond);
+	zephir_fetch_params(1, 2, 2, &type_param, &spec_param, &cond, &binds);
 
 	if (unlikely(Z_TYPE_P(type_param) != IS_STRING && Z_TYPE_P(type_param) != IS_NULL)) {
 		zephir_throw_exception_string(spl_ce_InvalidArgumentException, SL("Parameter 'type' must be a string") TSRMLS_CC);
@@ -497,39 +570,39 @@ PHP_METHOD(Pdm_Query_Common_Select, join) {
 	} else {
 		ZEPHIR_SEPARATE_PARAM(cond);
 	}
+	if (!binds) {
+		ZEPHIR_INIT_VAR(binds);
+		array_init(binds);
+	}
 
 
-	_0 = zephir_fetch_nproperty_this(this_ptr, SL("from"), PH_NOISY_CC);
-	if (unlikely(ZEPHIR_IS_EMPTY(_0))) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(pdm_query_exception_ce, "Cannot join() without from() first.", "pdm/query/common/select.zep", 282);
+	if (unlikely(Z_TYPE_P(binds) != IS_ARRAY)) {
+		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "binds must be an array.", "pdm/query/common/select.zep", 334);
 		return;
 	}
-	ZEPHIR_INIT_VAR(_1);
-	ZEPHIR_INIT_VAR(_2);
-	zephir_fast_trim(_2, type, NULL , ZEPHIR_TRIM_BOTH TSRMLS_CC);
-	zephir_fast_strtoupper(_1, _2);
-	ZEPHIR_INIT_VAR(join);
-	ZEPHIR_CONCAT_VS(join, _1, " JOIN ");
-	ZEPHIR_CALL_METHOD(&_3, this_ptr, "fixjoincondition", NULL, cond);
-	zephir_check_call_status();
-	ZEPHIR_CPY_WRT(cond, _3);
-	ZEPHIR_INIT_VAR(sql);
-	ZEPHIR_INIT_VAR(_4);
-	ZEPHIR_CONCAT_VVSV(_4, join, spec, " ", cond);
-	zephir_fast_trim(sql, _4, NULL , ZEPHIR_TRIM_BOTH TSRMLS_CC);
-	ZEPHIR_OBS_VAR(key);
-	_5 = zephir_fetch_nproperty_this(this_ptr, SL("from"), PH_NOISY_CC);
-	_6 = zephir_fetch_nproperty_this(this_ptr, SL("fromKey"), PH_NOISY_CC);
-	if (zephir_array_isset_fetch(&key, _5, _6, 0 TSRMLS_CC)) {
-		zephir_array_append(&key, sql, PH_SEPARATE);
-	} else {
-		ZEPHIR_INIT_BNVAR(key);
-		array_init_size(key, 2);
-		zephir_array_fast_append(key, sql);
+	_0 = zephir_fetch_nproperty_this(this_ptr, SL("from"), PH_NOISY_CC);
+	if (unlikely(ZEPHIR_IS_EMPTY(_0))) {
+		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(pdm_query_exception_ce, "Cannot join() without from() first.", "pdm/query/common/select.zep", 338);
+		return;
 	}
+	ZEPHIR_CALL_METHOD(&_1, this_ptr, "fixjoincondition", NULL, cond);
+	zephir_check_call_status();
+	ZEPHIR_CPY_WRT(cond, _1);
+	ZEPHIR_INIT_VAR(_2);
+	ZEPHIR_INIT_VAR(_3);
+	ZEPHIR_INIT_VAR(_4);
+	zephir_fast_trim(_4, type, NULL , ZEPHIR_TRIM_BOTH TSRMLS_CC);
+	zephir_fast_strtoupper(_3, _4);
+	ZEPHIR_INIT_VAR(_5);
+	ZEPHIR_CONCAT_VSVSV(_5, _3, " JOIN ", spec, " ", cond);
+	zephir_fast_trim(_2, _5, NULL , ZEPHIR_TRIM_BOTH TSRMLS_CC);
+	ZEPHIR_OBS_VAR(_6);
+	zephir_read_property_this(&_6, this_ptr, SL("joinKey"), PH_NOISY_CC);
+	zephir_update_property_array(this_ptr, SL("join"), _6, _2 TSRMLS_CC);
 	ZEPHIR_OBS_VAR(_7);
-	zephir_read_property_this(&_7, this_ptr, SL("fromKey"), PH_NOISY_CC);
-	zephir_update_property_array(this_ptr, SL("from"), _7, key TSRMLS_CC);
+	zephir_read_property_this(&_7, this_ptr, SL("joinKey"), PH_NOISY_CC);
+	zephir_update_property_array(this_ptr, SL("bindJoin"), _7, binds TSRMLS_CC);
+	RETURN_ON_FAILURE(zephir_property_incr(this_ptr, SL("joinKey") TSRMLS_CC));
 	RETURN_THIS();
 
 }
@@ -715,7 +788,7 @@ PHP_METHOD(Pdm_Query_Common_Select, joinSubSelect) {
 
 	_0 = zephir_fetch_nproperty_this(this_ptr, SL("from"), PH_NOISY_CC);
 	if (unlikely(ZEPHIR_IS_EMPTY(_0))) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(pdm_query_exception_ce, "Cannot join() without from() first.", "pdm/query/common/select.zep", 360);
+		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(pdm_query_exception_ce, "Cannot join() without from() first.", "pdm/query/common/select.zep", 409);
 		return;
 	}
 	ZEPHIR_INIT_VAR(_1);
@@ -783,8 +856,8 @@ PHP_METHOD(Pdm_Query_Common_Select, groupBy) {
 
 
 
-	if (Z_TYPE_P(spec) != IS_ARRAY) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "spec must be array.", "pdm/query/common/select.zep", 393);
+	if (unlikely(Z_TYPE_P(spec) != IS_ARRAY)) {
+		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "spec must be array.", "pdm/query/common/select.zep", 442);
 		return;
 	}
 	zephir_is_iterable(spec, &_1, &_0, 0, 0);
@@ -837,8 +910,8 @@ PHP_METHOD(Pdm_Query_Common_Select, having) {
 	}
 
 
-	if (Z_TYPE_P(binds) != IS_ARRAY) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "binds must be array.", "pdm/query/common/select.zep", 417);
+	if (unlikely(Z_TYPE_P(binds) != IS_ARRAY)) {
+		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "binds must be array.", "pdm/query/common/select.zep", 466);
 		return;
 	}
 	ZEPHIR_INIT_VAR(_0);
@@ -892,8 +965,8 @@ PHP_METHOD(Pdm_Query_Common_Select, orHaving) {
 	}
 
 
-	if (Z_TYPE_P(binds) != IS_ARRAY) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "binds must be array.", "pdm/query/common/select.zep", 438);
+	if (unlikely(Z_TYPE_P(binds) != IS_ARRAY)) {
+		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "binds must be array.", "pdm/query/common/select.zep", 487);
 		return;
 	}
 	ZEPHIR_INIT_VAR(_0);
@@ -1037,12 +1110,15 @@ PHP_METHOD(Pdm_Query_Common_Select, where) {
 	if (!binds) {
 		ZEPHIR_INIT_VAR(binds);
 		array_init(binds);
+	} else {
+		ZEPHIR_SEPARATE_PARAM(binds);
 	}
 
 
-	if (Z_TYPE_P(binds) != IS_ARRAY) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "binds must be array.", "pdm/query/common/select.zep", 512);
-		return;
+	if (unlikely(Z_TYPE_P(binds) != IS_ARRAY)) {
+		ZEPHIR_INIT_NVAR(binds);
+		array_init_size(binds, 2);
+		zephir_array_fast_append(binds, binds);
 	}
 	ZEPHIR_INIT_VAR(_0);
 	ZVAL_STRING(_0, "AND", 0);
@@ -1093,8 +1169,8 @@ PHP_METHOD(Pdm_Query_Common_Select, orWhere) {
 	}
 
 
-	if (Z_TYPE_P(binds) != IS_ARRAY) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "binds must be array.", "pdm/query/common/select.zep", 534);
+	if (unlikely(Z_TYPE_P(binds) != IS_ARRAY)) {
+		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "binds must be array.", "pdm/query/common/select.zep", 583);
 		return;
 	}
 	ZEPHIR_INIT_VAR(_0);
@@ -1177,8 +1253,8 @@ PHP_METHOD(Pdm_Query_Common_Select, orderBy) {
 
 
 
-	if (Z_TYPE_P(spec) != IS_ARRAY) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "spec must be array.", "pdm/query/common/select.zep", 581);
+	if (unlikely(Z_TYPE_P(spec) != IS_ARRAY)) {
+		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(spl_ce_InvalidArgumentException, "spec must be array.", "pdm/query/common/select.zep", 630);
 		return;
 	}
 	ZEPHIR_RETURN_CALL_METHOD(this_ptr, "addorderby", NULL, spec);
@@ -1342,7 +1418,7 @@ PHP_METHOD(Pdm_Query_Common_Select, reset) {
 PHP_METHOD(Pdm_Query_Common_Select, build) {
 
 	int ZEPHIR_LAST_CALL_STATUS;
-	zval *_0 = NULL, *_1 = NULL, *_2 = NULL, *_3 = NULL, *_4 = NULL, *_5 = NULL, *_6 = NULL, *_7 = NULL, *_8 = NULL;
+	zval *_0 = NULL, *_1 = NULL, *_2 = NULL, *_3 = NULL, *_4 = NULL, *_5 = NULL, *_6 = NULL, *_7 = NULL, *_8 = NULL, *_9 = NULL;
 
 	ZEPHIR_MM_GROW();
 
@@ -1352,19 +1428,21 @@ PHP_METHOD(Pdm_Query_Common_Select, build) {
 	zephir_check_call_status();
 	ZEPHIR_CALL_METHOD(&_2, this_ptr, "buildfrom",  NULL);
 	zephir_check_call_status();
-	ZEPHIR_CALL_METHOD(&_3, this_ptr, "buildwhere",  NULL);
+	ZEPHIR_CALL_METHOD(&_3, this_ptr, "buildjoin",  NULL);
 	zephir_check_call_status();
-	ZEPHIR_CALL_METHOD(&_4, this_ptr, "buildgroupby",  NULL);
+	ZEPHIR_CALL_METHOD(&_4, this_ptr, "buildwhere",  NULL);
 	zephir_check_call_status();
-	ZEPHIR_CALL_METHOD(&_5, this_ptr, "buildhaving",  NULL);
+	ZEPHIR_CALL_METHOD(&_5, this_ptr, "buildgroupby",  NULL);
 	zephir_check_call_status();
-	ZEPHIR_CALL_METHOD(&_6, this_ptr, "buildorderby",  NULL);
+	ZEPHIR_CALL_METHOD(&_6, this_ptr, "buildhaving",  NULL);
 	zephir_check_call_status();
-	ZEPHIR_CALL_METHOD(&_7, this_ptr, "buildlimit",  NULL);
+	ZEPHIR_CALL_METHOD(&_7, this_ptr, "buildorderby",  NULL);
 	zephir_check_call_status();
-	ZEPHIR_CALL_METHOD(&_8, this_ptr, "buildforupdate",  NULL);
+	ZEPHIR_CALL_METHOD(&_8, this_ptr, "buildlimit",  NULL);
 	zephir_check_call_status();
-	ZEPHIR_CONCAT_SVVVVVVVVV(return_value, "SELECT", _0, _1, _2, _3, _4, _5, _6, _7, _8);
+	ZEPHIR_CALL_METHOD(&_9, this_ptr, "buildforupdate",  NULL);
+	zephir_check_call_status();
+	ZEPHIR_CONCAT_SVVVVVVVVVV(return_value, "SELECT", _0, _1, _2, _3, _4, _5, _6, _7, _8, _9);
 	RETURN_MM();
 
 }
@@ -1387,7 +1465,7 @@ PHP_METHOD(Pdm_Query_Common_Select, buildSelect) {
 
 	_0 = zephir_fetch_nproperty_this(this_ptr, SL("select"), PH_NOISY_CC);
 	if (unlikely(ZEPHIR_IS_EMPTY(_0))) {
-		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(pdm_query_exception_ce, "No columns in the SELECT.", "pdm/query/common/select.zep", 698);
+		ZEPHIR_THROW_EXCEPTION_DEBUG_STR(pdm_query_exception_ce, "No columns in the SELECT.", "pdm/query/common/select.zep", 748);
 		return;
 	}
 	_1 = zephir_fetch_nproperty_this(this_ptr, SL("select"), PH_NOISY_CC);
@@ -1409,7 +1487,7 @@ PHP_METHOD(Pdm_Query_Common_Select, buildFrom) {
 	int ZEPHIR_LAST_CALL_STATUS;
 	HashTable *_3;
 	HashPosition _2;
-	zval *refs, *from = NULL, *_0, *_1, **_4, *_5 = NULL, *_6 = NULL, *_7 = NULL;
+	zval *refs, *sqlQuery = NULL, *_0, *_1, **_4, *_5 = NULL, *_6 = NULL, *_7 = NULL;
 
 	ZEPHIR_MM_GROW();
 
@@ -1425,11 +1503,11 @@ PHP_METHOD(Pdm_Query_Common_Select, buildFrom) {
 	  ; zephir_hash_get_current_data_ex(_3, (void**) &_4, &_2) == SUCCESS
 	  ; zephir_hash_move_forward_ex(_3, &_2)
 	) {
-		ZEPHIR_GET_HVALUE(from, _4);
+		ZEPHIR_GET_HVALUE(sqlQuery, _4);
 		ZEPHIR_INIT_NVAR(_5);
 		ZEPHIR_INIT_NVAR(_6);
 		ZEPHIR_GET_CONSTANT(_6, "PHP_EOL");
-		zephir_fast_join(_5, _6, from TSRMLS_CC);
+		zephir_fast_join(_5, _6, sqlQuery TSRMLS_CC);
 		zephir_array_append(&refs, _5, PH_SEPARATE);
 	}
 	ZEPHIR_INIT_NVAR(_5);
@@ -1437,6 +1515,47 @@ PHP_METHOD(Pdm_Query_Common_Select, buildFrom) {
 	ZEPHIR_CALL_METHOD(&_7, this_ptr, "indentcsv", NULL, refs);
 	zephir_check_call_status();
 	ZEPHIR_CONCAT_VSV(return_value, _5, "FROM", _7);
+	RETURN_MM();
+
+}
+
+/**
+ *
+ * Builds the JOIN clause.
+ *
+ * @return string
+ *
+ */
+PHP_METHOD(Pdm_Query_Common_Select, buildJoin) {
+
+	int ZEPHIR_LAST_CALL_STATUS;
+	HashTable *_3;
+	HashPosition _2;
+	zval *refs, *sqlQuery = NULL, *_0, *_1, **_4, *_5 = NULL, *_6 = NULL;
+
+	ZEPHIR_MM_GROW();
+
+	_0 = zephir_fetch_nproperty_this(this_ptr, SL("join"), PH_NOISY_CC);
+	if (ZEPHIR_IS_EMPTY(_0)) {
+		RETURN_MM_STRING("", 1);
+	}
+	ZEPHIR_INIT_VAR(refs);
+	array_init(refs);
+	_1 = zephir_fetch_nproperty_this(this_ptr, SL("join"), PH_NOISY_CC);
+	zephir_is_iterable(_1, &_3, &_2, 0, 0);
+	for (
+	  ; zephir_hash_get_current_data_ex(_3, (void**) &_4, &_2) == SUCCESS
+	  ; zephir_hash_move_forward_ex(_3, &_2)
+	) {
+		ZEPHIR_GET_HVALUE(sqlQuery, _4);
+		ZEPHIR_INIT_NVAR(_5);
+		ZEPHIR_GET_CONSTANT(_5, "PHP_EOL");
+		ZEPHIR_INIT_LNVAR(_6);
+		ZEPHIR_CONCAT_VV(_6, _5, sqlQuery);
+		zephir_array_append(&refs, _6, PH_SEPARATE);
+	}
+	ZEPHIR_RETURN_CALL_METHOD(this_ptr, "indent", NULL, refs);
+	zephir_check_call_status();
 	RETURN_MM();
 
 }
@@ -1523,7 +1642,7 @@ PHP_METHOD(Pdm_Query_Common_Select, buildForUpdate) {
 
 PHP_METHOD(Pdm_Query_Common_Select, __construct) {
 
-	zval *_0, *_1, *_2, *_3, *_4, *_5, *_6, *_7, *_8, *_9, *_10;
+	zval *_0, *_1, *_2, *_3, *_4, *_5, *_6, *_7, *_8, *_9, *_10, *_11, *_12;
 
 	ZEPHIR_MM_GROW();
 
@@ -1553,13 +1672,19 @@ PHP_METHOD(Pdm_Query_Common_Select, __construct) {
 	zephir_update_property_this(this_ptr, SL("from"), _7 TSRMLS_CC);
 	ZEPHIR_INIT_VAR(_8);
 	array_init(_8);
-	zephir_update_property_this(this_ptr, SL("groupBy"), _8 TSRMLS_CC);
+	zephir_update_property_this(this_ptr, SL("join"), _8 TSRMLS_CC);
 	ZEPHIR_INIT_VAR(_9);
 	array_init(_9);
-	zephir_update_property_this(this_ptr, SL("having"), _9 TSRMLS_CC);
+	zephir_update_property_this(this_ptr, SL("bindJoin"), _9 TSRMLS_CC);
 	ZEPHIR_INIT_VAR(_10);
 	array_init(_10);
-	zephir_update_property_this(this_ptr, SL("bindHaving"), _10 TSRMLS_CC);
+	zephir_update_property_this(this_ptr, SL("groupBy"), _10 TSRMLS_CC);
+	ZEPHIR_INIT_VAR(_11);
+	array_init(_11);
+	zephir_update_property_this(this_ptr, SL("having"), _11 TSRMLS_CC);
+	ZEPHIR_INIT_VAR(_12);
+	array_init(_12);
+	zephir_update_property_this(this_ptr, SL("bindHaving"), _12 TSRMLS_CC);
 	ZEPHIR_MM_RESTORE();
 
 }
